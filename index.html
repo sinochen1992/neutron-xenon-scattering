@@ -3,106 +3,107 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Explore neutron–xenon elastic scattering with two evaluated libraries, an optical model, and saved OPTMAN examples.">
-  <title>Neutron–Xenon Scattering Explorer</title>
+  <meta name="description" content="Neutron–xenon elastic scattering: what the evaluated libraries say, why they differ, and a model of the nucleus for comparison.">
+  <title>Neutron–Xenon Scattering Visualization</title>
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 <main>
   <header>
     <p class="eyebrow">A physics teaching tool · Chen Ding</p>
-    <h1>Neutron–Xenon Scattering Explorer</h1>
-    <p class="lead">Explore how neutron energy, xenon isotopes, and an assumed compound-elastic contribution change the angular and recoil spectra.</p>
-    <nav aria-label="Page sections"><a href="#explorer">Explore</a><a href="#physics">Understand the physics</a><a href="#optman">OPTMAN</a><a href="#diagnostic">Dip versus area</a><a href="#sources">Data and sources</a></nav>
+    <h1>Neutron–Xenon Scattering Visualization</h1>
+    <p class="lead">How a neutron scatters elastically on xenon between 10 keV and 20 MeV: what the evaluated nuclear-data libraries say, why they differ, and what a model of the nucleus predicts.</p>
+    <nav aria-label="Page sections"><a href="#libraries">The libraries</a><a href="#why">Why they differ</a><a href="#model">The model</a><a href="#details">Details</a><a href="#sources">Sources</a></nav>
     <p class="downloads"><a href="https://colab.research.google.com/github/sinochen1992/neutron-xenon-scattering/blob/main/Neutron_Xenon_Scattering_Colab.ipynb">Open in Colab</a> · <a href="Neutron_Xenon_Scattering_Colab.ipynb" download>Download the Colab notebook</a> · <a href="neutron_xe_portable.zip" download>Download the complete portable package</a></p>
     <p id="status" role="status" aria-live="polite">Loading the shared data bundle…</p>
   </header>
 
-  <section id="explorer" aria-labelledby="explorer-title">
-    <h2 id="explorer-title">Explore elastic scattering</h2>
-    <p>Start at DD energy, 2.45 MeV, with natural xenon. Both evaluated libraries start selected. Move the compound slider to 0.10 or 0.24 and watch the orange curve change while the evaluated curves stay fixed.</p>
+  <section id="libraries" aria-labelledby="libraries-title">
+    <h2 id="libraries-title">What the evaluated libraries say</h2>
+    <p class="reading">A neutron that scatters once on a xenon nucleus gives it a recoil energy fixed by the scattering angle: forward scattering gives the smallest recoils and backward scattering the largest, up to about 74 keV at 2.45 MeV, the deuterium–deuterium (DD) neutron energy. The angular distribution is therefore the recoil spectrum. ENDF/B-VII.1 (red) and JENDL-4.0u (green) give different distributions; JEFF-4.0 (gold) can be added. Drag the energy or choose an isotope, and the plots redraw at once.</p>
     <div id="main-panel" class="panel-host"></div>
   </section>
 
-  <section id="physics" class="reading" aria-labelledby="physics-title">
-    <h2 id="physics-title">What is being plotted?</h2>
-    <p>A <strong>cross section</strong> measures the likelihood of a specified interaction, expressed as an effective area. One barn (b) is 10⁻²⁸ m². “Total” includes every interaction; “elastic” is one part of it. In elastic scattering the neutron and xenon nucleus keep their identities and the nucleus ends in its original internal state. The nucleus can still gain recoil energy.</p>
-    <p><strong>Non-elastic</strong> means all other final states: an excited xenon nucleus (inelastic scattering), capture with gamma emission, and other energetically open channels such as emission of additional neutrons or charged particles. Which channels are open depends on isotope and neutron energy. Inelastic scattering is included in the accounting, but these plots show <strong>elastic recoils only</strong>.</p>
-    <div class="equations" aria-label="Cross-section accounting">
-      <p>σ<sub>total</sub> = σ<sub>elastic</sub> + σ<sub>non-elastic</sub></p>
-      <p>σ<sub>elastic</sub> = σ<sub>shape</sub> + σ<sub>compound elastic</sub></p>
-      <p>σ<sub>optical reaction</sub> = σ<sub>compound elastic</sub> + σ<sub>non-elastic</sub></p>
-    </div>
-    <p>The last two relations describe the energy-averaged bookkeeping used by this spherical-model illustration. Here σ<sub>total</sub> = σ<sub>shape</sub> + σ<sub>optical reaction</sub>. Setting fraction <i>f</i> assigns <i>f</i>σ<sub>optical reaction</sub> to compound elastic and leaves (1−<i>f</i>)σ<sub>optical reaction</sub> as non-elastic. It <strong>repartitions a fixed total</strong>. The slider does not add anything to the evaluated libraries.</p>
-    <p>For example, the direct spherical calculation for natural Xe at 2.45 MeV gives about 3.633 b of shape elastic and 2.195 b of optical reaction. With <i>f</i> = 0.10, 0.2195 b is assigned to compound elastic: elastic becomes about 3.853 b and non-elastic about 1.975 b. Their sum remains about 5.828 b. The display grid introduces small interpolation differences.</p>
-
-    <h3>Why “optical,” “potential,” and “shape”?</h3>
-    <p>The neutron behaves as a wave. The <strong>optical model</strong> describes its average interaction with a nucleus using a complex potential U = V + iW, analogous to refraction and absorption of light. The real part changes the wave's phase and direction; the imaginary part removes flux from the explicitly described elastic wave. Both parts affect elastic scattering.</p>
-    <p><strong>Shape elastic</strong> or <strong>potential elastic</strong> is the elastic scattering calculated from that potential. <strong>Optical reaction</strong> measures the flux missing from this coherent elastic wave. Some of that flux can form a compound nucleus and later return to the elastic final state. Therefore optical reaction is not automatically the same as the physical non-elastic cross section. Compound elastic describes that formation-and-decay mechanism; it is not another name for inelastic scattering.</p>
-    <p>The assumed compound term here is isotropic in the centre-of-mass frame: dσ<sub>compound</sub>/dΩ = σ<sub>compound</sub>/(4π). Actual compound emission need not be perfectly isotropic. Statistical decay models, such as Hauser–Feshbach calculations, are needed to predict its size and angular distribution.</p>
-
-    <h3>The four main plots</h3>
-    <ul>
-      <li><strong>Upper left — angle:</strong> dσ/dΩ is cross section per unit solid angle, in b/sr. θ is the neutron's centre-of-mass scattering angle. Blue is shape elastic; dashed orange is shape plus the assumed compound term. Deep dips arise from wave interference. The two evaluated curves already contain each library's complete elastic prediction.</li>
-      <li><strong>Upper right — recoil:</strong> the same elastic events are expressed as xenon recoil energy E<sub>R</sub>, in keV. For one isotope, E<sub>R</sub> = E<sub>max</sub>(1−cos θ)/2 and dσ/dE<sub>R</sub> = (4π/E<sub>max</sub>) dσ/dΩ. Head-on backscattering gives E<sub>max</sub> = [4m<sub>n</sub>M/(m<sub>n</sub>+M)²]T. Natural Xe sums nine isotope spectra with different endpoints; the marker uses the abundance-weighted mean mass. The horizontal limit is 1.15 times that marker. The marker is a kinematic endpoint, not a guaranteed peak.</li>
-      <li><strong>Lower left — partial waves:</strong> each integer ℓ is an orbital-angular-momentum component of the incoming wave (ℓ = 0, 1, 2 … are s, p, d …). Blue bars sum to the shape-elastic cross section; orange bars sum to optical reaction, not compound elastic. These are integrated cross sections, not angular curves. The phases between partial waves cause the angular interference and are not visible in the bars. kR is a rough scale for important waves, not a strict cutoff.</li>
-      <li><strong>Lower right — potential:</strong> this shows the depth magnitudes versus distance from the nuclear centre. The real nuclear potential is attractive; the plotted positive blue depth is its magnitude. The absorptive depth combines volume and surface terms; the spin–orbit term used by the solver is not drawn. R is the potential's radius scale. The 1/k and 2π/k rulers compare reduced and full neutron wavelengths; their vertical placement has no physical meaning. For natural Xe this panel illustrates the mean-mass potential, while scattering is calculated isotope by isotope.</li>
-    </ul>
-    <p>The black-sphere curve is a sharp absorption-limit toy model. The billiard-ball curve is a classical hard-sphere comparison, isotropic in the centre-of-mass frame. Neither replaces the optical model or a library evaluation.</p>
-    <h3>ENDF minus JENDL: a fifth plot</h3>
-    <p>The signed linear-scale plot below the four main panels subtracts JENDL-4.0u from ENDF/B-VII.1 at the same energy, isotope mixture and CM angle. It shows absolute elastic differential cross sections in b/sr, without dividing either curve by its elastic integral. A ratio would answer a different question.</p>
-    <div class="equations">Δ(θ) = (dσ/dΩ)<sub>ENDF/B-VII.1</sub> − (dσ/dΩ)<sub>JENDL-4.0u</sub><br>C = (σ<sub>el,ENDF</sub> − σ<sub>el,JENDL</sub>)/(4π) = (1/4π) ∫ Δ(θ) dΩ</div>
-    <p>The dashed line is the constant addition with the same integrated difference. For axial symmetry dΩ = 2π sin θ dθ; averaging uniformly over degrees gives the wrong angular weighting. The readout gives the solid-angle RMS of Δ−C over the full sphere. It describes angular variation, not a statistical uncertainty or a goodness-of-fit probability. Closeness to C must be judged relative to the accuracy needed and the display grid's interpolation limits.</p>
-    <p>A nearly horizontal difference is consistent with an isotropic change, but does not identify its physical mechanism. A sign-changing difference cannot be explained everywhere by adding a positive isotropic term alone. This diagnostic uses no optical-model subtraction and ignores the compound slider and overlay checkboxes. Energy and target controls update it continuously; axes stay fixed, with a separate manual difference-range selector and a notice when the curve is clipped.</p>
-
-    <h3>What do the evaluated libraries provide?</h3>
-    <p>The ENDF format identifies total cross section as MT=1 and elastic as MT=2. MT=3 denotes non-elastic when supplied; MT=4 is summed inelastic, MT=51–91 are its component levels/continuum, MT=102 is radiative capture, and MT=16 is (n,2n). Do not add an aggregate such as MT=4 to the levels it already contains. The loaded tool uses only total, elastic, and elastic angular distributions (MF=3 and MF=4); it does not import every reaction channel.</p>
-    <p>Legendre coefficients describe the angular distribution. They do not label shape versus compound mechanisms. The same final elastic angular curve can admit different model decompositions. Comparing two evaluations, or changing Legendre coefficients in a transport reweighting, does not by itself isolate compound elastic. The optical model shown here is an independently chosen baseline, not either evaluator's recovered internal calculation.</p>
+  <section id="why" class="reading" aria-labelledby="why-title">
+    <h2 id="why-title">Why the libraries differ</h2>
+    <p><strong>They are built differently.</strong> JENDL-4.0u evaluates all nine stable xenon isotopes with one coupled-channel and statistical calculation. ENDF/B-VII.1 combines five older evaluations; its files for Xe-132, 134 and 136 (<span data-f="cendl_abundance">…</span>% of natural xenon), taken from the Chinese evaluation CENDL-3, assemble a measured total cross section, an elastic cross section obtained by subtraction and a separately calculated angular shape.</p>
+    <p><strong>Three files fail a physical bound.</strong> The optical theorem requires the forward elastic cross section to be at least (kσ<sub>total</sub>/4π)², with k the centre-of-mass wave number. At 2.45 MeV those three ENDF/B-VII.1 files fall <span data-f="cendl_below">…</span>% below it, so their total, elastic cross section and angular shape cannot come from one scattering amplitude. JENDL-4.0u and JEFF-4.0 satisfy the bound for every isotope (smallest ratios <span data-f="jendl_min">…</span> and <span data-f="jeff40_min">…</span>). Passing does not prove a file right.</p>
+    <p><strong>They cause most of the low-energy recoil difference.</strong> For one elastic scatter at 2.45 MeV, ENDF/B-VII.1 puts <span data-f="below10_endf">…</span>% of recoils below 10 keV and JENDL-4.0u <span data-f="below10_jendl">…</span>%. Replacing only those three files by their JENDL-4.0u versions closes <span data-f="swap_cendl">…</span>% of that gap.</p>
+    <p><strong>The difference is not a constant.</strong> The plot below the four main plots shows ENDF/B-VII.1 minus JENDL-4.0u. At 2.45 MeV it is neither a constant nor a cos θ term (<span data-f="share_const">…</span>% and <span data-f="share_cos">…</span>% of its square integrated over solid angle): ENDF/B-VII.1 is lower at forward angles and higher by a near-constant <span data-f="region_const">…</span> b/sr from <span data-f="region_from">…</span>° to <span data-f="region_to">…</span>° (recoils of <span data-f="region_recoil">…</span> keV). The CENDL-3 files build <span data-f="share_cendl">…</span>% of that stretch and the Xe-129 and Xe-131 files <span data-f="share_129">…</span>% and <span data-f="share_131">…</span>%.</p>
+    <div id="findings-table" class="table-wrap"></div>
   </section>
 
-  <section id="optman" aria-labelledby="optman-title">
-    <h2 id="optman-title">Saved OPTMAN calculations</h2>
-    <p>OPTMAN is an optical-model solver that can explicitly couple nuclear excitation channels. It is a code, not a synonym for “shape.” These saved examples cover Xe-132 at two energies. The orange curve remains an assumption: no POD statistical-decay calculation is included.</p>
-    <div id="optman-panel" class="panel-host"></div>
-    <div class="reading">
-      <p>With explicit direct inelastic channels, the bookkeeping is σ<sub>total</sub> = σ<sub>shape</sub> + σ<sub>direct inelastic</sub> + σ<sub>absorption</sub>. This panel assigns σ<sub>compound</sub> = <i>f</i>σ<sub>absorption</sub>, while σ<sub>non-elastic</sub> = σ<sub>direct inelastic</sub> + (1−<i>f</i>)σ<sub>absorption</sub>. Its denominator therefore differs from the spherical panel whenever direct excitation is nonzero.</p>
-      <p>The dotted orange curve shows the assumed component alone. For a single isotope it is constant both per unit solid angle and per unit recoil energy, up to the elastic endpoint. At zero it cannot appear on a logarithmic axis. This display neither runs Fortran nor interpolates OPTMAN to uncomputed energies.</p>
-    </div>
+  <section id="model" class="reading" aria-labelledby="model-title">
+    <h2 id="model-title">A model for comparison</h2>
+    <p>The blue and orange curves come from a calculation, not from a library. Shape elastic is the scattering by the average neutron–nucleus potential (Koning–Delaroche, spherical). Compound elastic, where the neutron is absorbed into a compound nucleus that then re-emits it, comes from a Hauser–Feshbach calculation (TALYS) with the same potential and has its calculated angular shape. The slider moves only within that calculation's range with a width-fluctuation correction: at 2.45 MeV, <span data-f="comp_share">…</span> of the reaction cross section, and almost nothing above <span data-f="comp_zero_above">…</span> MeV.</p>
+    <p>The model is one potential. It does not show which library is right, and the difference between a library and the model's shape elastic is not compound elastic: it depends on the potential chosen and can be negative.</p>
   </section>
 
-  <section id="diagnostic" aria-labelledby="diagnostic-title">
-    <h2 id="diagnostic-title">Why 0.10 / 0.24 differ from 0.072 / 0.124</h2>
-    <div class="reading">
-      <p>Matching the dip height and matching the total area are different conditions. These saved diagnostics use native evaluated curves and a direct spherical calculation for natural Xe at 2.45 MeV. They are more precise than the main slider grid.</p>
-      <div class="equations">
-        <p>f<sub>area</sub> = (σ<sub>evaluated elastic</sub> − σ<sub>shape</sub>) / σ<sub>optical reaction</sub></p>
-        <p>f<sub>local</sub>(θ) = 4π [(dσ/dΩ)<sub>evaluated</sub> − (dσ/dΩ)<sub>shape</sub>] / σ<sub>optical reaction</sub></p>
+  <section id="details" aria-labelledby="details-title">
+    <h2 id="details-title">Details</h2>
+
+    <details class="reading">
+      <summary>Reading the plots</summary>
+      <ul>
+        <li><strong>Angle:</strong> dσ/dΩ is the cross section per unit solid angle, in b/sr (1 b = 10⁻²⁸ m²), against the neutron's centre-of-mass scattering angle θ. Deep minima come from interference between partial waves.</li>
+        <li><strong>Recoil:</strong> the same elastic events as xenon recoil energy, E<sub>R</sub> = E<sub>max</sub>(1−cos θ)/2 and dσ/dE<sub>R</sub> = (4π/E<sub>max</sub>) dσ/dΩ for one isotope. Natural xenon sums nine isotopes with slightly different endpoints; the marker is the mean-mass endpoint. Dashed red lines mark minima of the model curve.</li>
+        <li><strong>ENDF minus JENDL:</strong> the signed difference in b/sr, with the constant that has the same integrated area (dashed). Its readout gives the solid-angle RMS about that constant, a description, not an uncertainty.</li>
+        <li><strong>Partial waves:</strong> each ℓ is an orbital-angular-momentum component of the wave. Blue bars sum to the shape-elastic cross section, orange bars to the cross section removed from the elastic wave. Integrating over angle removes the interference, so the bars cannot show where the minima are; kR is a rough scale for how many waves matter.</li>
+        <li><strong>Potential:</strong> the real depth and the absorptive depth (volume plus surface) against distance from the nuclear centre; R is the radius and the arrow the reduced wavelength 1/k. For natural xenon the panel draws the mean-mass potential, while scattering is calculated isotope by isotope.</li>
+      </ul>
+      <p>The optional black-sphere and billiard-ball curves are idealizations for contrast: a sharp absorbing sphere, and classical hard spheres scattering isotropically.</p>
+    </details>
+
+    <details class="reading">
+      <summary>Cross-section accounting</summary>
+      <div class="equations" aria-label="Cross-section accounting">
+        <p>σ<sub>total</sub> = σ<sub>elastic</sub> + σ<sub>non-elastic</sub></p>
+        <p>σ<sub>elastic</sub> = σ<sub>shape</sub> + σ<sub>compound elastic</sub></p>
+        <p>σ<sub>reaction</sub> = σ<sub>compound elastic</sub> + σ<sub>non-elastic</sub></p>
       </div>
-      <p>The solid-angle average of f<sub>local</sub> equals f<sub>area</sub>. A truly isotropic difference would give a horizontal local-residual curve. A negative residual means this chosen shape model exceeds the evaluation there; it is not a negative physical compound cross section.</p>
-    </div>
-    <div id="diagnostic-plot" class="diagnostic-grid"></div>
-    <div id="diagnostic-table" class="table-wrap"></div>
-    <p class="reading">Thus 0.10 and 0.24 can help match parts of the dip while overshooting the integrated elastic cross section. These are model-dependent visual choices, not measured compound fractions. No paper confirming those two numbers as physical JENDL and ENDF compound fractions has been identified in the source review for this tool.</p>
-  </section>
+      <p><strong>Elastic</strong> leaves the nucleus in its original state; <strong>non-elastic</strong> is everything else: inelastic scattering to an excited state, capture with gamma emission, and other open channels. These plots show elastic recoils only.</p>
+      <p><strong>Shape</strong> and <strong>compound</strong> describe how an elastic outcome is reached, not further final states. The model removes the <strong>reaction cross section</strong> from the elastic wave; part of it returns as compound elastic, the rest is non-elastic, so compound elastic moves cross section between the two groups and the total stays fixed. For natural xenon at 2.45 MeV the spherical calculation gives <span data-d="shape_b">…</span> b of shape elastic and <span data-d="reaction_b">…</span> b of reaction cross section. A calculation that also follows the excitation of low-lying levels, such as the OPTMAN panel below, splits off that direct excitation first; a compound fraction means nothing until its denominator is stated.</p>
+      <p>The evaluated files store total, elastic and angular data (ENDF reaction identifiers MT=1 and MT=2, files 3 and 4). Their Legendre coefficients describe the angular distribution; they do not label shape or compound mechanisms.</p>
+    </details>
 
-  <section id="sources" class="reading" aria-labelledby="sources-title">
-    <h2 id="sources-title">Coverage, precision, and sources</h2>
-    <p>The shared bundle contains ENDF/B-VII.1 and the qualified JENDL-4.0u comparison, nine xenon isotopes, a 0.01–20 MeV optical grid, and the saved OPTMAN examples. The evaluated grid includes exact 2.45 and 14.1 MeV anchors and 1° angular samples. Energies within unreconstructed resolved or unresolved resonance ranges are masked. A mixture requires coverage for every isotope; unavailable isotopes are never silently dropped.</p>
-    <p><strong>JENDL qualification:</strong> the Xe files are the NNDC JENDL-4.0 snapshot. JAEA's inspected update register lists no Xe update, supporting their use for this comparison, but a byte-for-byte comparison with the JENDL-4.0u archive has not been established. The visible “JENDL-4.0u” label retains this qualification.</p>
-    <p>The optical grid interpolates in log energy and log angular cross section. The evaluated display interpolates linearly in energy and cos θ, with discrete angular normalization. Deep minima between energy samples can have large relative errors; this is a teaching display, not a precision transport or dip-fitting database. Nonrelativistic kinematics use M = A × amu. The downloaded Colab notebook exposes the arrays and includes an optional direct spherical-model check; it does not contain raw ENDF inputs, resonance reconstruction, POD, or a Fortran compiler.</p>
-    <div id="coverage-table" class="table-wrap"></div>
-    <ul>
-      <li><a href="https://www.nndc.bnl.gov/endf-b7.1/">NNDC ENDF/B-VII.1</a>; <a href="https://wwwndc.jaea.go.jp/jendl/j40/j40.html">JAEA JENDL-4.0</a>; <a href="https://wwwndc.jaea.go.jp/jendl/j40/update/">JENDL-4.0 update register</a>.</li>
-      <li><a href="https://www.nndc.bnl.gov/endfdocs/ENDF-102-2023.pdf">ENDF-102 format manual</a> for reaction identifiers and angular representations.</li>
-      <li><a href="https://doi.org/10.1016/S0375-9474(02)01321-0">Koning and Delaroche (2003)</a>, the global optical potential used by the spherical model.</li>
-      <li><a href="https://github.com/IAEA-NDS/OPTMAN/tree/48e94f360552fe43ae1764225d8dd601ca9c51a1">IAEA OPTMAN source snapshot</a>; <a href="https://doi.org/10.1080/18811248.2007.9711321">Kunieda et al. (2007)</a>; <a href="https://github.com/IAEA-NDS/RIPL-4">IAEA RIPL</a>.</li>
-    </ul>
-    <p>Figures generated for this tool from these public evaluations and documented model inputs. Full input hashes, source URLs, model assumptions, and bundle metadata are available below.</p>
-    <button id="download-provenance" type="button" disabled>Download provenance JSON</button>
-    <p id="bundle-info" class="muted"></p>
+    <details class="reading">
+      <summary>A coupled-channel calculation for Xe-132 (OPTMAN)</summary>
+      <p>OPTMAN is an optical-model code that can couple the excitation of low-lying levels to elastic scattering. These saved calculations cover Xe-132 at 2.45 and 14.1 MeV, with the Kunieda coupled-channel potential and, as a cross-check, the spherical Koning–Delaroche potential. Compound elastic is taken from the TALYS calculation and removed from the remaining absorption, so the total stays fixed.</p>
+      <div id="optman-panel" class="panel-host"></div>
+    </details>
+
+    <details class="reading">
+      <summary>Filling the minimum versus matching the area</summary>
+      <p>An isotropic addition that fills a library's diffraction minimum over the model's shape elastic is not the one that matches the library's elastic cross section. The plots show, against angle, the isotropic fraction of the reaction cross section that would make the model equal each library there (solid), the value that matches the area (dashed) and the value that fills the minimum (dotted). The local value varies strongly and turns negative where the library lies below the model, so no single isotropic addition reproduces either library; a negative value is not a negative compound cross section.</p>
+      <div class="equations">
+        <p>f<sub>area</sub> = (σ<sub>library elastic</sub> − σ<sub>shape</sub>) / σ<sub>reaction</sub></p>
+        <p>f<sub>local</sub>(θ) = 4π [(dσ/dΩ)<sub>library</sub> − (dσ/dΩ)<sub>shape</sub>] / σ<sub>reaction</sub></p>
+      </div>
+      <div id="diagnostic-plot" class="diagnostic-grid"></div>
+      <div id="diagnostic-table" class="table-wrap"></div>
+      <p>None of these numbers is a measured or evaluated compound fraction; they are residuals of one chosen model.</p>
+    </details>
+
+    <details class="reading" id="sources">
+      <summary>Coverage, precision and sources</summary>
+      <p>The shared bundle contains ENDF/B-VII.1, the qualified JENDL-4.0u comparison and JEFF-4.0 for the nine stable xenon isotopes, the spherical-model grid from 0.01 to 20 MeV, the TALYS compound-elastic range and shape, and the saved OPTMAN examples. The evaluated grid includes exact 2.45 and 14.1 MeV samples and 1° angles. Energies inside resonance ranges that are not reconstructed are masked, and a mixture needs every isotope.</p>
+      <p><strong>JENDL qualification:</strong> the Xe files are the NNDC JENDL-4.0 snapshot. JAEA's update register lists no Xe update, and their angular coefficients reproduce those of the IAEA JENDL-4.0u conversion for Geant4 to 10⁻¹⁶ (orders up to 10, 1–3 MeV); byte identity with the 4.0u archive has not been established.</p>
+      <p>The model grid interpolates in log energy and log angular cross section; the evaluated display interpolates linearly in energy and cos θ. Deep minima between energy samples can have large relative errors: this is a teaching display, not a transport or fitting database. Non-relativistic kinematics use M = A × amu, except the forward-limit test above, which uses the relativistic wave number.</p>
+      <div id="coverage-table" class="table-wrap"></div>
+      <ul>
+        <li><a href="https://www.nndc.bnl.gov/endf-b7.1/">NNDC ENDF/B-VII.1</a>; <a href="https://wwwndc.jaea.go.jp/jendl/j40/j40.html">JAEA JENDL-4.0</a> and its <a href="https://wwwndc.jaea.go.jp/jendl/j40/update/">update register</a>; <a href="https://www.oecd-nea.org/dbdata/jeff/">NEA JEFF</a>.</li>
+        <li><a href="https://www.nndc.bnl.gov/endfdocs/ENDF-102-2023.pdf">ENDF-102 format manual</a>.</li>
+        <li><a href="https://doi.org/10.1016/S0375-9474(02)01321-0">Koning and Delaroche (2003)</a>, the global optical potential of the model.</li>
+        <li><a href="https://github.com/arjankoning1/talys">TALYS</a> (A. Koning et al.; Eur. Phys. J. A 59, 131, 2023), the Hauser–Feshbach calculation of compound elastic.</li>
+        <li><a href="https://github.com/IAEA-NDS/OPTMAN/tree/48e94f360552fe43ae1764225d8dd601ca9c51a1">IAEA OPTMAN source snapshot</a>; <a href="https://doi.org/10.1080/18811248.2007.9711321">Kunieda et al. (2007)</a>; <a href="https://github.com/IAEA-NDS/RIPL-4">IAEA RIPL</a>.</li>
+      </ul>
+      <p>Figures generated for this tool from these public evaluations and documented model inputs. Input hashes, source URLs, model assumptions and bundle metadata are in the provenance file.</p>
+      <button id="download-provenance" type="button" disabled>Download provenance JSON</button>
+      <p id="bundle-info" class="muted"></p>
+    </details>
   </section>
 </main>
-<footer>Neutron–Xenon Scattering Explorer · Shared data and rendering for the browser and Colab</footer>
+<footer>Neutron–Xenon Scattering Visualization · Shared data and rendering for the browser and Colab</footer>
 <script src="assets/app.js"></script>
 </body>
 </html>

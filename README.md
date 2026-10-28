@@ -1,12 +1,13 @@
-# Neutron–Xenon Scattering Explorer
+# Neutron–Xenon Scattering Visualization
 
-Interactive elastic-scattering plots, two evaluated libraries (ENDF/B-VII.1 and
-qualified JENDL-4.0u), a spherical optical model, saved Xe-132 OPTMAN examples,
-and beginner physics explanations. A fifth interactive plot shows the signed
-ENDF/B-VII.1 minus JENDL-4.0u elastic differential cross section, a constant
-reference Δσ_el/(4π), and the solid-angle RMS about that reference. Energy and
-target update it; the compound slider does not. Axes remain fixed with manual
-zoom. This comparison does not identify a compound-elastic mechanism.
+Neutron–xenon elastic scattering from 10 keV to 20 MeV: what the evaluated
+libraries ENDF/B-VII.1 and qualified JENDL-4.0u (and, optionally, JEFF-4.0) say,
+why they differ (three ENDF/B-VII.1 files fail the optical-theorem forward limit
+at 2.45 MeV), and a model for comparison: Koning–Delaroche shape elastic plus the
+compound elastic of a Hauser–Feshbach (TALYS) calculation with the same potential,
+bounded to that calculation's range. The signed ENDF/B-VII.1 minus JENDL-4.0u plot
+shows how the difference is built. Details (plot guide, accounting, the Xe-132
+coupled-channel examples, dip versus area, sources) are folded on the page.
 
 Website: https://sinochen1992.github.io/neutron-xenon-scattering/
 

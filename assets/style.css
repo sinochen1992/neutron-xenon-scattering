@@ -36,3 +36,7 @@ button:disabled { opacity:.5; cursor:default; }
 footer { text-align:center; padding:25px; color:var(--muted); font-size:.85rem; }
 @media(max-width:700px) { main { padding:15px 8px 35px; } section { padding:16px 10px; } .diagnostic-grid { grid-template-columns:1fr; } }
 @media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+details{margin:12px 0;border:1px solid #d9e1e7;border-radius:6px;padding:6px 12px;background:#fbfcfd}
+details>summary{cursor:pointer;font-weight:600;padding:4px 0}
+details[open]>summary{margin-bottom:6px}
+td.below{color:#b00020;font-weight:600}
