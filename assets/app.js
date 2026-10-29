@@ -2,13 +2,11 @@
 (function () {
   'use strict';
   const REQUIRED = ['assets/data.json.gz', 'assets/panels.json'];
-  // LaTeX in the page and in the plot frame is typeset by KaTeX 0.16.11 (pinned, with integrity hashes); without it
-  // the LaTeX source shows. Chen, 2026-10-29: "you should use latex".
-  const KATEX = 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/';
-  const KATEX_HEAD = '<link rel="stylesheet" href="' + KATEX + 'katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">' +
-    '<script defer src="' + KATEX + 'katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"><\/script>' +
-    '<script defer src="' + KATEX + 'contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body)"><\/script>';
+  // LaTeX on the page is typeset by KaTeX 0.16.11 (loaded by index.html, pinned, with integrity hashes); without it the
+  // LaTeX source shows. Chen, 2026-10-29: "you should use latex".
   const typeset = node => { if (node && globalThis.renderMathInElement) renderMathInElement(node); };
+  // The plot frames load MathJax instead: it typesets their text and turns the canvas axis labels into images.
+  const MATHJAX_HEAD = '<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" integrity="sha384-KKWa9jJ1MZvssLeOoXG6FiOAZfAgmzsIIfw8BXwI9+kYm0lPCbC6yTQPBC00F1/L" crossorigin="anonymous"><\/script>';
   const decode64 = value => Uint8Array.from(atob(value), c => c.charCodeAt(0));
   const escapeHTML = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   async function verify(bytes, record, name) {
@@ -72,7 +70,7 @@
         notifyHeight();
       }
     });
-    frame.srcdoc = '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' + KATEX_HEAD + '<style>' + style + '</style><body>' + body + resize + '</body></html>';
+    frame.srcdoc = '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' + MATHJAX_HEAD + '<style>' + style + '</style><body>' + body + resize + '</body></html>';
     host.replaceChildren(frame);
   }
   function diagnostic(bundle) {
@@ -97,7 +95,7 @@
         '<path d="M'+x(s.shape_dip_angle_deg)+' 90V300" stroke="#aaa"/>'+
         '<polyline points="'+points+'" fill="none" stroke="#0072b2" stroke-width="2"/>'+
         '<circle cx="'+x(s.shape_dip_angle_deg)+'" cy="'+y(row.at_shape_dip_fraction)+'" r="4" fill="#0072b2"/>'+
-        '<text x="290" y="350" text-anchor="middle">Centre-of-mass angle θ (degrees)</text><text transform="translate(16,195) rotate(-90)" text-anchor="middle">Fraction of the reaction cross section</text></g></svg>';
+        '<foreignObject x="60" y="334" width="470" height="22"><div xmlns="http://www.w3.org/1999/xhtml" style="text-align:center;font:12px system-ui,sans-serif;color:#173047">Centre-of-mass angle \\(\\theta\\) (degrees)</div></foreignObject><text transform="translate(16,195) rotate(-90)" text-anchor="middle">Fraction of the reaction cross section</text></g></svg>';
     }
     document.getElementById('diagnostic-plot').innerHTML = plots;
     document.getElementById('diagnostic-table').innerHTML = '<table><caption>Native calculation; shape minimum '+s.shape_dip_angle_deg.toFixed(2)+'°. Browser recoil column uses the display grid.</caption><thead><tr><th>Evaluation</th><th>Area match</th><th>At shape minimum</th><th>At '+s.probe_angle_deg+'°</th><th>Browser recoil dip</th><th>Excess if the minimum-filling value is applied at every angle</th></tr></thead><tbody>'+s.rows.map(r=>'<tr><td>'+escapeHTML(r.label)+'</td><td>'+r.area_fraction.toFixed(4)+'</td><td>'+r.at_shape_dip_fraction.toFixed(4)+'</td><td>'+r.at_probe_fraction.toFixed(4)+'</td><td>'+r.browser_recoil_dip_fraction.toFixed(4)+'</td><td>+'+r.visual_area_excess_b.toFixed(4)+' b (+'+r.visual_area_excess_percent.toFixed(2)+'%)</td></tr>').join('')+'</tbody></table>';
@@ -162,7 +160,7 @@
   load().then(({manifest, data, templates}) => {
     mount('main-panel', templates.main, data.main);
     mount('optman-panel', templates.optman, data.optman);
-    diagnostic(data); findings(data); sources(data,manifest); typeset(document.getElementById('why'));
+    diagnostic(data); findings(data); sources(data,manifest); typeset(document.getElementById('why')); typeset(document.getElementById('details'));
     document.getElementById('status').textContent = 'Ready · ENDF/B-VII.1 and JENDL-4.0u (JEFF-4.0 optional) · Shared data checksums verified';
     if (typeof location !== 'undefined') { openTarget(); window.addEventListener('hashchange', openTarget); }
     if (globalThis.NXE_EMBEDDED) document.querySelector('.downloads').hidden=true;
