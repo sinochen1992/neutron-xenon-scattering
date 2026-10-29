@@ -2,6 +2,13 @@
 (function () {
   'use strict';
   const REQUIRED = ['assets/data.json.gz', 'assets/panels.json'];
+  // LaTeX in the page and in the plot frame is typeset by KaTeX 0.16.11 (pinned, with integrity hashes); without it
+  // the LaTeX source shows. Chen, 2026-10-29: "you should use latex".
+  const KATEX = 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/';
+  const KATEX_HEAD = '<link rel="stylesheet" href="' + KATEX + 'katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">' +
+    '<script defer src="' + KATEX + 'katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"><\/script>' +
+    '<script defer src="' + KATEX + 'contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body)"><\/script>';
+  const typeset = node => { if (node && globalThis.renderMathInElement) renderMathInElement(node); };
   const decode64 = value => Uint8Array.from(atob(value), c => c.charCodeAt(0));
   const escapeHTML = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   async function verify(bytes, record, name) {
@@ -48,7 +55,7 @@
   function mount(hostId, template, data) {
     const host = document.getElementById(hostId);
     const frame = document.createElement('iframe');
-    frame.title = hostId === 'main-panel' ? 'Interactive neutron–xenon angular, recoil, ENDF-minus-JENDL difference, partial-wave and potential plots' : 'Interactive Xe-132 coupled-channel (OPTMAN) angular and recoil plots';
+    frame.title = hostId === 'main-panel' ? 'Interactive neutron–xenon recoil (with cos θ), angular, ENDF-minus-JENDL difference (against cos θ), partial-wave and potential plots' : 'Interactive Xe-132 coupled-channel (OPTMAN) angular and recoil plots';
     const root = hostId === 'main-panel' ? 'nxe-main' : 'nxe-optman';
     const body = template.replaceAll('ROOT', root).replace('__DATA__', JSON.stringify(data).replaceAll('</', '<\\/'));
     // Responsive layout changes sizing only; numerical and drawing code is shared verbatim.
@@ -65,7 +72,7 @@
         notifyHeight();
       }
     });
-    frame.srcdoc = '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>' + style + '</style><body>' + body + resize + '</body></html>';
+    frame.srcdoc = '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' + KATEX_HEAD + '<style>' + style + '</style><body>' + body + resize + '</body></html>';
     host.replaceChildren(frame);
   }
   function diagnostic(bundle) {
@@ -104,8 +111,34 @@
       document.querySelectorAll('[data-d]').forEach(n => { const v = derived[n.dataset.d]; if (v === undefined) throw Error('Missing value: ' + n.dataset.d); n.textContent = v; });
     }
     const pass = v => v >= 1 ? 'ok' : 'below';
-    document.getElementById('findings-table').innerHTML = '<table><caption>Stored forward elastic cross section divided by its optical-theorem lower limit, (kσ<sub>total</sub>/4π)², each file against its own total, at 2.45 MeV. Below 1 the file is internally inconsistent; above 1 it is consistent, not necessarily right.</caption><thead><tr><th>Isotope</th><th>ENDF/B-VII.1</th><th>JENDL-4.0u</th><th>JEFF-4.0</th><th>ENDF/B-VII.1 file from</th></tr></thead><tbody>' +
-      F.table.map(r => '<tr><td>Xe-' + r.A + '</td>' + ['endfb71', 'jendl40', 'jeff40'].map(k => '<td class="' + pass(r[k]) + '">' + r[k].toFixed(3) + '</td>').join('') + '<td>' + escapeHTML(r.lineage) + '</td></tr>').join('') + '</tbody></table>';
+    const lineage = Object.fromEntries(F.lineage.map(r => [r.A, r]));
+    // Table 1: who made each file, and whether it meets the forward limit (Chen, 2026-10-29: Table II of the note).
+    document.getElementById('findings-table').innerHTML = '<table><caption>Who made each file (from its own description, MF1/MT451), and its stored forward elastic cross section divided by the optical-theorem lower limit \\((k\\sigma_{\\rm tot}/4\\pi)^2\\), each file against its own total, at 2.45 MeV. Below 1 the file is internally inconsistent; above 1 it is consistent, not necessarily right. All JENDL-4.0u xenon files are JENDL-4.0 (OPTMAN coupled channels + POD).</caption><thead><tr><th>Isotope</th><th>% of natural Xe</th><th>ENDF/B-VII.1 file from</th><th>ENDF/B-VII.1</th><th>JENDL-4.0u</th><th>JEFF-4.0 file from</th><th>JEFF-4.0</th></tr></thead><tbody>' +
+      F.table.map(r => '<tr><td>Xe-' + r.A + '</td><td>' + lineage[r.A].percent.toFixed(2) + '</td><td>' + escapeHTML(lineage[r.A].endfb71) + '</td><td class="' + pass(r.endfb71) + '">' + r.endfb71.toFixed(3) + '</td><td class="' + pass(r.jendl40) + '">' + r.jendl40.toFixed(3) + '</td><td>' + escapeHTML(lineage[r.A].jeff40) + '</td><td class="' + pass(r.jeff40) + '">' + r.jeff40.toFixed(3) + '</td></tr>').join('') + '</tbody></table>';
+    agreement(F.agreement);
+    document.getElementById('lineage-table').innerHTML = '<table><caption>Where the fast-neutron data of each xenon file come from, in five releases (seven libraries: ENDF/B-VIII.0 and VIII.1 store the same xenon files, as do JENDL-4.0u and JENDL-5), read from each file\'s own description.</caption><thead><tr><th>Isotope</th><th>%</th>' +
+      F.releases.map(c => '<th>' + escapeHTML(c.label) + '</th>').join('') + '</tr></thead><tbody>' +
+      F.lineage.map(r => '<tr><td>Xe-' + r.A + '</td><td>' + r.percent.toFixed(2) + '</td>' + F.releases.map(c => '<td>' + escapeHTML(r[c.key]) + '</td>').join('') + '</tr>').join('') + '</tbody></table>';
+  }
+  function agreement(G) {
+    // Table 2: who agrees with whom. Near-identical pairs are named with the code each file names (Chen, 2026-10-29).
+    const L = G.labels, code = s => s.shape.replace(/ \(TENDL[^)]*\)/, '').replace(', neutron potential not adjusted', '');
+    const cols = [['jeff40', 'jendl40'], ['endfb71', 'jendl40'], ['jeff40', 'endfb71'], ['jeff40', 'talys']];
+    const cell = (q, check) => '<td class="' + (q.near_identical && !check ? 'near' : '') + '">' + q.distance_pct.toFixed(1) + '%' + (q.near_identical && !check ? ' ≈' : '') + '</td>';
+    const note = r => r.pairs.slice(0, 3).filter(q => q.near_identical).map(q => {
+      const a = r.sources[q.a], b = r.sources[q.b];
+      const how = q.relation === 'same code' ? 'same code (' + a.family + '): in effect one calculation, not two independent ones' :
+        q.relation === 'different codes' ? 'different codes: ' + L[q.a] + ' ' + code(a) + '; ' + L[q.b] + ' ' + code(b) :
+        q.relation === 'a fitted angular distribution against a calculation' ? 'a fit against a calculation: ' +
+          [[q.a, a], [q.b, b]].map(([k, s]) => L[k] + ' ' + (s.family === 'CHAD fit' ? 'angular distribution ' + s.angular + ' (ENDF/B-IV)' : code(s))).join('; ') :
+        'one file names no code';
+      return '<b>' + escapeHTML(L[q.a]) + ' and ' + escapeHTML(L[q.b]) + '</b> (' + q.distance_pct.toFixed(1) + '%): ' + escapeHTML(how);
+    }).join('<br>');
+    const find = (r, a, b) => r.pairs.find(q => q.a === a && q.b === b);
+    document.getElementById('agreement-table').innerHTML = '<table><caption>Who agrees with whom at 2.45 MeV: the percentage of elastic scatters that would have to change angle to turn one file\'s angular distribution into the other\'s, \\(d_{ab} = \\tfrac12\\int_{-1}^{1}|p_a-p_b|\\,d\\mu\\). ≈ marks two files within ' + G.near_identical_pct + '%; the last column names the code each of them says it used. The JEFF-4.0 − TALYS column compares JEFF-4.0 with a default TALYS run made for this tool (Koning–Delaroche potential).</caption><thead><tr><th>Isotope</th>' +
+      cols.map(c => '<th>' + escapeHTML(L[c[0]]) + ' − ' + escapeHTML(L[c[1]]) + '</th>').join('') + '<th class="note">Near-identical pairs and the codes they name</th></tr></thead><tbody>' +
+      G.rows.map(r => '<tr><td>Xe-' + r.A + '</td>' + cols.map((c, i) => cell(find(r, c[0], c[1]), i === 3)).join('') + '<td class="note">' + note(r) + '</td></tr>').join('') +
+      '<tr><td>natural Xe</td>' + cols.map(c => '<td>' + G.natural.find(q => q.a === c[0] && q.b === c[1]).distance_pct.toFixed(1) + '%</td>').join('') + '<td class="note">isotopes weighted by abundance × each file\'s own elastic cross section</td></tr></tbody></table>';
   }
   function openTarget() {   // a link to a folded section opens it
     const target = location.hash && document.getElementById(location.hash.slice(1));
@@ -129,7 +162,7 @@
   load().then(({manifest, data, templates}) => {
     mount('main-panel', templates.main, data.main);
     mount('optman-panel', templates.optman, data.optman);
-    diagnostic(data); findings(data); sources(data,manifest);
+    diagnostic(data); findings(data); sources(data,manifest); typeset(document.getElementById('why'));
     document.getElementById('status').textContent = 'Ready · ENDF/B-VII.1 and JENDL-4.0u (JEFF-4.0 optional) · Shared data checksums verified';
     if (typeof location !== 'undefined') { openTarget(); window.addEventListener('hashchange', openTarget); }
     if (globalThis.NXE_EMBEDDED) document.querySelector('.downloads').hidden=true;

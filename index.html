@@ -3,9 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Neutron–xenon elastic scattering: what the evaluated libraries say, why they differ, and a model of the nucleus for comparison.">
+  <meta name="description" content="Neutron–xenon elastic scattering: what the evaluated libraries say, the mathematics behind the plots, why the libraries differ, and a model of the nucleus for comparison.">
   <title>Neutron–Xenon Scattering Visualization</title>
   <link rel="stylesheet" href="assets/style.css">
+  <!-- Mathematics: LaTeX typeset by KaTeX 0.16.11 (MIT), pinned with integrity hashes; without it the LaTeX source shows. -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body)"></script>
 </head>
 <body>
 <main>
@@ -13,30 +17,106 @@
     <p class="eyebrow">A physics teaching tool · Chen Ding</p>
     <h1>Neutron–Xenon Scattering Visualization</h1>
     <p class="lead">How a neutron scatters elastically on xenon between 10 keV and 20 MeV: what the evaluated nuclear-data libraries say, why they differ, and what a model of the nucleus predicts.</p>
-    <nav aria-label="Page sections"><a href="#libraries">The libraries</a><a href="#why">Why they differ</a><a href="#model">The model</a><a href="#details">Details</a><a href="#sources">Sources</a></nav>
+    <nav aria-label="Page sections"><a href="#libraries">The libraries</a><a href="#math">The mathematics</a><a href="#why">Why they differ</a><a href="#model">The model</a><a href="#details">Details</a><a href="#sources">Sources</a></nav>
     <p class="downloads"><a href="https://colab.research.google.com/github/sinochen1992/neutron-xenon-scattering/blob/main/Neutron_Xenon_Scattering_Colab.ipynb">Open in Colab</a> · <a href="Neutron_Xenon_Scattering_Colab.ipynb" download>Download the Colab notebook</a> · <a href="neutron_xe_portable.zip" download>Download the complete portable package</a></p>
     <p id="status" role="status" aria-live="polite">Loading the shared data bundle…</p>
   </header>
 
   <section id="libraries" aria-labelledby="libraries-title">
     <h2 id="libraries-title">What the evaluated libraries say</h2>
-    <p class="reading">A neutron that scatters once on a xenon nucleus gives it a recoil energy fixed by the scattering angle: forward scattering gives the smallest recoils and backward scattering the largest, up to about 74 keV at 2.45 MeV, the deuterium–deuterium (DD) neutron energy. The angular distribution is therefore the recoil spectrum. ENDF/B-VII.1 (red) and JENDL-4.0u (green) give different distributions; JEFF-4.0 (gold) can be added. Drag the energy or choose an isotope, and the plots redraw at once.</p>
+    <p class="reading">A neutron that scatters once on a xenon nucleus gives it a recoil energy fixed by the scattering angle: forward scattering gives the smallest recoils and backward scattering the largest, up to about 74 keV at 2.45 MeV, the deuterium–deuterium (DD) neutron energy. The angular distribution is therefore the recoil spectrum. The top-left plot shows that recoil spectrum, with \((1-\cos\theta)/2\), the fraction of the largest recoil, along its top edge; the top-right plot shows the same scattering against the angle \(\theta\). ENDF/B-VII.1 (red) and JENDL-4.0u (green) give different distributions; JEFF-4.0 (gold) can be added. Drag the energy or choose an isotope, and the plots redraw at once.</p>
     <div id="main-panel" class="panel-host"></div>
+  </section>
+
+  <section id="math" class="reading" aria-labelledby="math-title">
+    <h2 id="math-title">The mathematics behind the plots</h2>
+    <p><strong>Angle, solid angle and recoil energy.</strong> Write \(\mu = \cos\theta\), with \(\theta\) the scattering angle in the centre-of-mass (CM) frame. Solid angle is \(d\Omega = 2\pi\,d\mu\), so equal steps in \(\mu\) are equal solid angle, and the elastic cross section is \(2\pi\) times the area under \(d\sigma/d\Omega\) against \(\mu\). One elastic scatter gives the nucleus the fraction \((1-\cos\theta)/2 = \sin^2(\theta/2)\) of the largest possible recoil energy; that fraction is the scale along the top of the top-left plot. The recoil spectrum is therefore the angular distribution against \(\mu\), read backwards. The momentum transfer \(q\) is linear in \(\theta\) at small angles, and its square is linear in \(\mu\).</p>
+    <div class="equations">
+      \[ \sigma_{\rm el} = 2\pi\int_{-1}^{1}\frac{d\sigma}{d\Omega}\,d\mu \]
+      \[ E_R = E_{\max}\,\frac{1-\mu}{2},\qquad E_{\max} = \frac{4\,m_n M}{(m_n+M)^2}\,E_n,\qquad \frac{d\sigma}{dE_R} = \frac{4\pi}{E_{\max}}\,\frac{d\sigma}{d\Omega} \]
+      \[ q = 2k\sin\frac{\theta}{2},\qquad q^2 = 2k^2(1-\mu),\qquad E_R = \frac{\hbar^2q^2}{2M} \]
+    </div>
+    <p><strong>Partial waves \(\ell\): the amplitude.</strong> The incoming wave is a sum of partial waves of orbital angular momentum \(\ell\). The nucleus multiplies the outgoing part of each by one complex number \(S_\ell = \eta_\ell\,e^{2i\delta_\ell}\), with phase shift \(\delta_\ell\) and \(0 \le \eta_\ell \le 1\) (\(\eta_\ell \lt 1\) means absorption). The shape-elastic differential cross section is \(|f(\theta)|^2\), written here without the neutron spin, whose spin–orbit part adds a spin-flip term that vanishes at \(0^\circ\). Waves with \(\ell\) well above \(kR\) (about 2.1 for xenon at 2.45 MeV) miss the nucleus; \(\ell = 3\) and 4 reach only its diffuse surface, so \(\ell = 0\)–4 scatter (the partial-wave plot).</p>
+    <div class="equations">
+      \[ f(\theta) = \frac{1}{2ik}\sum_\ell (2\ell+1)\,(S_\ell-1)\,P_\ell(\mu),\qquad \Big(\frac{d\sigma}{d\Omega}\Big)_{\rm shape} = |f(\theta)|^2 \]
+      \[ \sigma_{\rm shape} = \frac{\pi}{k^2}\sum_\ell (2\ell+1)\,|1-S_\ell|^2,\qquad \sigma_{\rm reaction} = \frac{\pi}{k^2}\sum_\ell (2\ell+1)\,\big(1-|S_\ell|^2\big) \]
+    </div>
+    <p><strong>Legendre orders \(L\): the cross section.</strong> Squaring a sum of Legendre polynomials \(P_\ell\) gives products \(P_\ell P_{\ell'}\), and each product is a sum of \(P_L\) with \(|\ell-\ell'| \le L \le \ell+\ell'\) and \(\ell+\ell'+L\) even. The cross section is therefore a Legendre series in \(\mu\) up to \(L = 2\ell_{\max}\), 8 for xenon at 2.45 MeV. This series is how the evaluated files store elastic scattering: the elastic cross section \(\sigma_{\rm el}\) and the coefficients \(a_L\), with \(a_0 = 1\). Each coefficient is the average of its polynomial over the distribution, so \(a_1\) is the mean of \(\cos\theta\).</p>
+    <div class="equations">
+      \[ P_\ell(\mu)\,P_{\ell'}(\mu) = \sum_L \langle \ell\,0\,\ell'\,0\,|\,L\,0\rangle^2\,P_L(\mu) \]
+      \[ \frac{d\sigma}{d\Omega} = \frac{\sigma_{\rm el}}{2\pi}\sum_L \frac{2L+1}{2}\,a_L\,P_L(\mu),\qquad a_L = \int_{-1}^{1}P_L(\mu)\,p(\mu)\,d\mu,\qquad p = \frac{2\pi}{\sigma_{\rm el}}\,\frac{d\sigma}{d\Omega} \]
+    </div>
+    <p><strong>A Legendre order is not a partial wave.</strong> With only s and p waves (\(\ell = 0, 1\)) and no absorption, the cross section below has an \(L = 1\) term that comes from the interference of the s and p waves. A p wave alone gives \(\mu^2 = (1+2P_2)/3\), orders \(L = 0\) and 2. A \(\cos\theta\) term in a library, or a difference between libraries in \(L = 1\), is therefore not "the p wave": every order mixes several partial waves. Compound elastic, averaged over many compound states, is symmetric about \(90^\circ\) and has even \(L\) only.</p>
+    <div class="equations">
+      \[ \frac{d\sigma}{d\Omega} = \frac{1}{k^2}\Big[\sin^2\delta_0 + 6\sin\delta_0\sin\delta_1\cos(\delta_0-\delta_1)\,\mu + 9\sin^2\delta_1\,\mu^2\Big] \]
+    </div>
+    <p><strong>The forward limit.</strong> The optical theorem ties the total cross section to the imaginary part of the forward amplitude. Since \(|f(0)|^2 \ge (\operatorname{Im} f(0))^2\) and compound elastic only adds, every consistent description has a forward elastic cross section of at least \((k\sigma_{\rm tot}/4\pi)^2\). In a file, with \(P_L(1) = 1\), the forward value is the sum below. When the total, the elastic cross section and the \(a_L\) come from one calculation, the bound holds automatically; when they are fixed separately, it need not (next section).</p>
+    <div class="equations">
+      \[ \sigma_{\rm tot} = \frac{4\pi}{k}\,\operatorname{Im} f(0),\qquad \frac{d\sigma}{d\Omega}(0) = \frac{\sigma_{\rm el}}{2\pi}\sum_L \frac{2L+1}{2}\,a_L \;\ge\; \Big(\frac{k\,\sigma_{\rm tot}}{4\pi}\Big)^2 \]
+    </div>
+    <p><strong>The black sphere.</strong> \(S_\ell = 0\) for every wave that reaches the nucleus (\(\ell \le \ell_c \approx kR\)) and 1 for the others. The amplitude below is then purely imaginary, so the forward limit holds with equality; the elastic and absorption cross sections are equal; and the real sum changes sign between its lobes, so the minima are exact zeros. A real nucleus refracts the wave: its real potential gives phase shifts, so \(S_\ell\) is complex, the amplitude has a real part, and its single minimum near \(94^\circ\) at 2.45 MeV is not an exact zero; compound elastic fills it further.</p>
+    <div class="equations">
+      \[ f(\theta) = \frac{i}{2k}\sum_{\ell\le\ell_c}(2\ell+1)\,P_\ell(\mu),\qquad \sigma_{\rm shape} = \sigma_{\rm reaction} = \frac{\pi}{k^2}\,(\ell_c+1)^2 \]
+    </div>
   </section>
 
   <section id="why" class="reading" aria-labelledby="why-title">
     <h2 id="why-title">Why the libraries differ</h2>
-    <p><strong>They are built differently.</strong> JENDL-4.0u evaluates all nine stable xenon isotopes with one coupled-channel and statistical calculation. ENDF/B-VII.1 combines five older evaluations; its files for Xe-132, 134 and 136 (<span data-f="cendl_abundance">…</span>% of natural xenon), taken from the Chinese evaluation CENDL-3, assemble a measured total cross section, an elastic cross section obtained by subtraction and a separately calculated angular shape.</p>
-    <p><strong>Three files fail a physical bound.</strong> The optical theorem requires the forward elastic cross section to be at least (kσ<sub>total</sub>/4π)², with k the centre-of-mass wave number. At 2.45 MeV those three ENDF/B-VII.1 files fall <span data-f="cendl_below">…</span>% below it, so their total, elastic cross section and angular shape cannot come from one scattering amplitude. JENDL-4.0u and JEFF-4.0 satisfy the bound for every isotope (smallest ratios <span data-f="jendl_min">…</span> and <span data-f="jeff40_min">…</span>). Passing does not prove a file right.</p>
-    <p><strong>They cause most of the low-energy recoil difference.</strong> For one elastic scatter at 2.45 MeV, ENDF/B-VII.1 puts <span data-f="below10_endf">…</span>% of recoils below 10 keV and JENDL-4.0u <span data-f="below10_jendl">…</span>%. Replacing only those three files by their JENDL-4.0u versions closes <span data-f="swap_cendl">…</span>% of that gap.</p>
-    <p><strong>The difference is not a constant.</strong> The plot below the four main plots shows ENDF/B-VII.1 minus JENDL-4.0u. At 2.45 MeV it is neither a constant nor a cos θ term (<span data-f="share_const">…</span>% and <span data-f="share_cos">…</span>% of its square integrated over solid angle): ENDF/B-VII.1 is lower at forward angles and higher by a near-constant <span data-f="region_const">…</span> b/sr from <span data-f="region_from">…</span>° to <span data-f="region_to">…</span>° (recoils of <span data-f="region_recoil">…</span> keV). The CENDL-3 files build <span data-f="share_cendl">…</span>% of that stretch and the Xe-129 and Xe-131 files <span data-f="share_129">…</span>% and <span data-f="share_131">…</span>%.</p>
+    <p><strong>They are built differently.</strong> Each library's xenon files come from a different chain of calculations and measurements, read from the files' own descriptions. In JENDL-4.0u one calculation gives the total, the elastic cross section and the angular shape. In ENDF/B-VII.1's files for Xe-132, 134 and 136 (<span data-f="cendl_abundance">…</span>% of natural xenon), taken from the Chinese evaluation CENDL-3, these three numbers are fixed separately.</p>
+    <div class="chains" role="list" aria-label="How each library builds its xenon files">
+      <div class="chain" role="listitem" style="--c:#2ca02c">
+        <h3>JENDL-4.0u · all nine isotopes</h3>
+        <p>OPTMAN coupled-channel optical model (Kunieda potential; low-lying levels coupled as a rigid rotor: up to 6⁺ for Xe-124 to 130, 4⁺ for Xe-132 and 134, 2⁺ for Xe-136, two levels for Xe-129 and Xe-131) → total, shape elastic and its angles, transmission coefficients</p>
+        <p class="arrow">↓</p>
+        <p>POD Hauser–Feshbach–Moldauer statistical model → compound elastic and its angles</p>
+        <p>Total, elastic cross section and \(a_L\) from one set of \(S_\ell\).</p>
+        <p class="verdict">Forward limit: passes by construction (smallest ratio <span data-f="jendl_min">…</span>)</p>
+      </div>
+      <div class="chain" role="listitem" style="--c:#bc9500">
+        <h3>JEFF-4.0 · all nine isotopes</h3>
+        <p>TALYS (TENDL-2024; Xe-124 and Xe-128 from TENDL-2014), spherical Koning–Delaroche potential, not adjusted → shape elastic; Hauser–Feshbach → compound elastic</p>
+        <p>Total "calculated with the optical model … or partly reproduced using experimental data"; elastic = total − calculated non-elastic.</p>
+        <p>At 2.45 MeV a TALYS run made for this tool, with the unadjusted Koning–Delaroche neutron potential, reproduces every JEFF-4.0 elastic angular distribution to <span data-f="jeff_talys_max">…</span>% of scatters or better. The files' listed adjustments (level densities, gamma strengths, the proton potential) can therefore change it by at most about that much.</p>
+        <p class="verdict">Forward limit: passes (smallest ratio <span data-f="jeff40_min">…</span>)</p>
+      </div>
+      <div class="chain" role="listitem" style="--c:#d62728">
+        <h3>ENDF/B-VII.1 · Xe-132, 134, 136 (CENDL-3)</h3>
+        <p>Total: evaluated "based on" a 1960 natural-xenon measurement (Vaughn et al.)</p>
+        <p>Elastic: total − calculated non-elastic (SUNF statistical + DWUCK direct)</p>
+        <p>Angular shape: optical model (code not named) + compound elastic from SUNF, normalized</p>
+        <p>Three numbers fixed separately; nothing makes them agree.</p>
+        <p class="verdict fails">Forward limit: fails, <span data-f="cendl_below">…</span>% below</p>
+      </div>
+      <div class="chain" role="listitem" style="--c:#d62728">
+        <h3>ENDF/B-VII.1 · the other six</h3>
+        <p>Xe-126, 128, 129: JENDL-3.3, CASTHY spherical optical + statistical model</p>
+        <p>Xe-131: BNL–KAERI 2006, EMPIRE with ECIS coupled channels + Hauser–Feshbach</p>
+        <p>Xe-130: ENDF/B-IV with later changes to its cross sections; shape elastic from ABACUS-2 and compound from COMMNUC, angular distribution fitted with CHAD (how its elastic cross section was obtained is not stated)</p>
+        <p>Xe-124: LLNL 2011, TALYS-1.0</p>
+        <p>Each is one model chain at 2.45 MeV, except that Xe-130's file does not say.</p>
+        <p class="verdict">Forward limit: passes</p>
+      </div>
+    </div>
+    <p><strong>Three files fail a physical bound.</strong> The forward limit of the previous section requires the forward elastic cross section to be at least \((k\sigma_{\rm tot}/4\pi)^2\), with \(k\) the centre-of-mass wave number. At 2.45 MeV the three CENDL-3 files of ENDF/B-VII.1 fall <span data-f="cendl_below">…</span>% below it, so their total, elastic cross section and angular shape cannot come from one scattering amplitude. JENDL-4.0u and JEFF-4.0 satisfy the bound for every isotope. Passing does not prove a file right.</p>
     <div id="findings-table" class="table-wrap"></div>
+    <p><strong>They cause most of the low-energy recoil difference.</strong> For one elastic scatter at 2.45 MeV, ENDF/B-VII.1 puts <span data-f="below10_endf">…</span>% of recoils below 10 keV and JENDL-4.0u <span data-f="below10_jendl">…</span>%. Replacing only those three files by their JENDL-4.0u versions closes <span data-f="swap_cendl">…</span>% of that gap.</p>
+    <p><strong>The difference is not a constant.</strong> The plot below the four main plots shows ENDF/B-VII.1 minus JENDL-4.0u against \(\cos\theta\), where a constant would be a flat line and a \(\cos\theta\) term a straight one. At 2.45 MeV it is neither (<span data-f="share_const">…</span>% and <span data-f="share_cos">…</span>% of its square integrated over solid angle): ENDF/B-VII.1 is lower at forward angles and higher from <span data-f="region_from">…</span>° to <span data-f="region_to">…</span>° (recoils of <span data-f="region_recoil">…</span> keV), by <span data-f="region_const">…</span> b/sr on average; the difference is zero at both ends of that stretch and largest near 70°. The CENDL-3 files build <span data-f="share_cendl">…</span>% of that stretch and the Xe-129 and Xe-131 files <span data-f="share_129">…</span>% and <span data-f="share_131">…</span>%.</p>
+    <p><strong>Who agrees with whom, and with which code.</strong> The table below gives, for each pair of files, the percentage of elastic scatters that would have to change angle to turn one angular distribution into the other, \(d_{ab} = \tfrac12\int_{-1}^{1}|p_a(\mu)-p_b(\mu)|\,d\mu\); for one isotope it is also the percentage of its recoils that would change energy. Two files within <span data-f="near_pct">…</span>% are marked ≈ and named in words, together with the code each file says it used.</p>
+    <ul>
+      <li><strong>Near-identical results from different codes</strong> mean that two model calculations agree. They are not a measurement and do not show that either file is right.</li>
+      <li><strong>JEFF-4.0's elastic data are what TALYS gives.</strong> At 2.45 MeV a TALYS run made for this tool, with the unadjusted Koning–Delaroche neutron potential its files name, reproduces every JEFF-4.0 elastic angular distribution to <span data-f="jeff_talys_max">…</span>% of scatters or better.</li>
+      <li><strong>Two files made with the same code are in effect one calculation, not two independent ones.</strong> ENDF/B-VII.1's Xe-124 (LLNL, TALYS-1.0) and JEFF-4.0's (TENDL-2014, TALYS) differ by <span data-f="same124">…</span>%.</li>
+      <li><strong>ENDF/B-VII.1's Xe-130 and JENDL-4.0u</strong> are also within 2%, but that file's angular distribution was fitted (with CHAD) rather than calculated, so this is a fit against a calculation.</li>
+      <li><strong>Natural xenon.</strong> JEFF-4.0 sits close to JENDL-4.0u (<span data-f="nat_jeff_jendl">…</span>%, against <span data-f="nat_endf_jendl">…</span>% between ENDF/B-VII.1 and JENDL-4.0u and <span data-f="nat_jeff_endf">…</span>% between JEFF-4.0 and ENDF/B-VII.1). The main reason is the CENDL-3 files: <span data-f="cendl_dist">…</span>% from both JEFF-4.0 and JENDL-4.0u, they make up <span data-f="cendl_abundance">…</span>% of natural xenon. Xe-129 adds most of the rest. For Xe-124 to Xe-128, JEFF-4.0 is close to ENDF/B-VII.1's spherical calculations (Xe-124 0.3%, same code; Xe-126 and 128 2.3–2.6%, just above the cut), and JENDL-4.0u is the outlier (5.4–9.6%).</li>
+      <li><strong>At 14.1 MeV</strong>, JEFF-4.0 and JENDL-4.0u are near-identical for Xe-<span data-f="near14_list">…</span> (<span data-f="near14_range">…</span>%).</li>
+    </ul>
+    <div id="agreement-table" class="table-wrap"></div>
   </section>
 
   <section id="model" class="reading" aria-labelledby="model-title">
     <h2 id="model-title">A model for comparison</h2>
     <p>The blue and orange curves come from a calculation, not from a library. Shape elastic is the scattering by the average neutron–nucleus potential (Koning–Delaroche, spherical). Compound elastic, where the neutron is absorbed into a compound nucleus that then re-emits it, comes from a Hauser–Feshbach calculation (TALYS) with the same potential and has its calculated angular shape. The slider moves only within that calculation's range with a width-fluctuation correction: at 2.45 MeV, <span data-f="comp_share">…</span> of the reaction cross section, and almost nothing above <span data-f="comp_zero_above">…</span> MeV.</p>
-    <p>The model is one potential. It does not show which library is right, and the difference between a library and the model's shape elastic is not compound elastic: it depends on the potential chosen and can be negative.</p>
+    <p>The model is one potential. It does not show which library is right, and the difference between a library and the model's shape elastic is not compound elastic: it depends on the potential chosen and can be negative. JEFF-4.0 is the same kind of calculation with the same potential, so agreement between the model and JEFF-4.0 is not an independent check.</p>
   </section>
 
   <section id="details" aria-labelledby="details-title">
@@ -45,11 +125,11 @@
     <details class="reading">
       <summary>Reading the plots</summary>
       <ul>
-        <li><strong>Angle:</strong> dσ/dΩ is the cross section per unit solid angle, in b/sr (1 b = 10⁻²⁸ m²), against the neutron's centre-of-mass scattering angle θ. Deep minima come from interference between partial waves.</li>
-        <li><strong>Recoil:</strong> the same elastic events as xenon recoil energy, E<sub>R</sub> = E<sub>max</sub>(1−cos θ)/2 and dσ/dE<sub>R</sub> = (4π/E<sub>max</sub>) dσ/dΩ for one isotope. Natural xenon sums nine isotopes with slightly different endpoints; the marker is the mean-mass endpoint. Dashed red lines mark minima of the model curve.</li>
-        <li><strong>ENDF minus JENDL:</strong> the signed difference in b/sr, with the constant that has the same integrated area (dashed). Its readout gives the solid-angle RMS about that constant, a description, not an uncertainty.</li>
-        <li><strong>Partial waves:</strong> each ℓ is an orbital-angular-momentum component of the wave. Blue bars sum to the shape-elastic cross section, orange bars to the cross section removed from the elastic wave. Integrating over angle removes the interference, so the bars cannot show where the minima are; kR is a rough scale for how many waves matter.</li>
-        <li><strong>Potential:</strong> the real depth and the absorptive depth (volume plus surface) against distance from the nuclear centre; R is the radius and the arrow the reduced wavelength 1/k. For natural xenon the panel draws the mean-mass potential, while scattering is calculated isotope by isotope.</li>
+        <li><strong>Recoil (top left):</strong> the elastic events as xenon recoil energy, \(E_R = E_{\max}(1-\cos\theta)/2\) and \(d\sigma/dE_R = (4\pi/E_{\max})\,d\sigma/d\Omega\) for one isotope. The top scale gives \((1-\cos\theta)/2 = E_R/E_{\max}\): 0 for forward scattering, 1 for backward. It is exact for one isotope; natural xenon sums nine isotopes with slightly different endpoints, and the scale uses the mean-mass endpoint, which the vertical marker shows. Dashed red lines mark minima of the model curve.</li>
+        <li><strong>Angle (top right):</strong> \(d\sigma/d\Omega\) is the cross section per unit solid angle, in b/sr (1 b = \(10^{-28}\) m²), against the neutron's centre-of-mass scattering angle \(\theta\). Near \(0^\circ\) and \(180^\circ\) a degree holds little solid angle (\(d\Omega = 2\pi\sin\theta\,d\theta\)), so this view enlarges the forward peak and the backward rise compared with their share of the recoils. Deep minima come from interference between partial waves.</li>
+        <li><strong>ENDF minus JENDL:</strong> the signed difference in b/sr against \(\mu = \cos\theta\), forward scattering at the left, with \(\theta\) along the top, and the constant that has the same integrated area (dashed). Its readout gives the solid-angle RMS about that constant, a description, not an uncertainty.</li>
+        <li><strong>Partial waves:</strong> each \(\ell\) is an orbital-angular-momentum component of the wave. Blue bars sum to the shape-elastic cross section, orange bars to the cross section removed from the elastic wave. Integrating over angle removes the interference, so the bars cannot show where the minima are; \(kR\) is a rough scale for how many waves matter.</li>
+        <li><strong>Potential:</strong> the real depth and the absorptive depth (volume plus surface) against distance from the nuclear centre; \(R\) is the radius and the arrow the reduced wavelength \(1/k\). For natural xenon the panel draws the mean-mass potential, while scattering is calculated isotope by isotope.</li>
       </ul>
       <p>The optional black-sphere and billiard-ball curves are idealizations for contrast: a sharp absorbing sphere, and classical hard spheres scattering isotropically.</p>
     </details>
@@ -57,13 +137,18 @@
     <details class="reading">
       <summary>Cross-section accounting</summary>
       <div class="equations" aria-label="Cross-section accounting">
-        <p>σ<sub>total</sub> = σ<sub>elastic</sub> + σ<sub>non-elastic</sub></p>
-        <p>σ<sub>elastic</sub> = σ<sub>shape</sub> + σ<sub>compound elastic</sub></p>
-        <p>σ<sub>reaction</sub> = σ<sub>compound elastic</sub> + σ<sub>non-elastic</sub></p>
+        \[ \sigma_{\rm total} = \sigma_{\rm elastic} + \sigma_{\text{non-elastic}} \]
+        \[ \sigma_{\rm elastic} = \sigma_{\rm shape} + \sigma_{\text{compound elastic}} \]
+        \[ \sigma_{\rm reaction} = \sigma_{\text{compound elastic}} + \sigma_{\text{non-elastic}} \]
       </div>
       <p><strong>Elastic</strong> leaves the nucleus in its original state; <strong>non-elastic</strong> is everything else: inelastic scattering to an excited state, capture with gamma emission, and other open channels. These plots show elastic recoils only.</p>
       <p><strong>Shape</strong> and <strong>compound</strong> describe how an elastic outcome is reached, not further final states. The model removes the <strong>reaction cross section</strong> from the elastic wave; part of it returns as compound elastic, the rest is non-elastic, so compound elastic moves cross section between the two groups and the total stays fixed. For natural xenon at 2.45 MeV the spherical calculation gives <span data-d="shape_b">…</span> b of shape elastic and <span data-d="reaction_b">…</span> b of reaction cross section. A calculation that also follows the excitation of low-lying levels, such as the OPTMAN panel below, splits off that direct excitation first; a compound fraction means nothing until its denominator is stated.</p>
-      <p>The evaluated files store total, elastic and angular data (ENDF reaction identifiers MT=1 and MT=2, files 3 and 4). Their Legendre coefficients describe the angular distribution; they do not label shape or compound mechanisms.</p>
+      <p>The evaluated files store total, elastic and angular data (ENDF reaction identifiers MT=1 and MT=2, files 3 and 4). Their Legendre coefficients \(a_L\) describe the angular distribution; they do not label shape or compound mechanisms.</p>
+    </details>
+
+    <details class="reading">
+      <summary>Where each library's xenon files come from (five releases)</summary>
+      <div id="lineage-table" class="table-wrap"></div>
     </details>
 
     <details class="reading">
@@ -76,8 +161,8 @@
       <summary>Filling the minimum versus matching the area</summary>
       <p>An isotropic addition that fills a library's diffraction minimum over the model's shape elastic is not the one that matches the library's elastic cross section. The plots show, against angle, the isotropic fraction of the reaction cross section that would make the model equal each library there (solid), the value that matches the area (dashed) and the value that fills the minimum (dotted). The local value varies strongly and turns negative where the library lies below the model, so no single isotropic addition reproduces either library; a negative value is not a negative compound cross section.</p>
       <div class="equations">
-        <p>f<sub>area</sub> = (σ<sub>library elastic</sub> − σ<sub>shape</sub>) / σ<sub>reaction</sub></p>
-        <p>f<sub>local</sub>(θ) = 4π [(dσ/dΩ)<sub>library</sub> − (dσ/dΩ)<sub>shape</sub>] / σ<sub>reaction</sub></p>
+        \[ f_{\rm area} = \frac{\sigma_{\text{library elastic}} - \sigma_{\rm shape}}{\sigma_{\rm reaction}} \]
+        \[ f_{\rm local}(\theta) = \frac{4\pi\,\big[(d\sigma/d\Omega)_{\rm library} - (d\sigma/d\Omega)_{\rm shape}\big]}{\sigma_{\rm reaction}} \]
       </div>
       <div id="diagnostic-plot" class="diagnostic-grid"></div>
       <div id="diagnostic-table" class="table-wrap"></div>
@@ -86,9 +171,9 @@
 
     <details class="reading" id="sources">
       <summary>Coverage, precision and sources</summary>
-      <p>The shared bundle contains ENDF/B-VII.1, the qualified JENDL-4.0u comparison and JEFF-4.0 for the nine stable xenon isotopes, the spherical-model grid from 0.01 to 20 MeV, the TALYS compound-elastic range and shape, and the saved OPTMAN examples. The evaluated grid includes exact 2.45 and 14.1 MeV samples and 1° angles. Energies inside resonance ranges that are not reconstructed are masked, and a mixture needs every isotope.</p>
+      <p>The shared bundle contains ENDF/B-VII.1, the qualified JENDL-4.0u comparison and JEFF-4.0 for the nine stable xenon isotopes, the spherical-model grid from 0.01 to 20 MeV, the TALYS compound-elastic range and shape, and the saved OPTMAN examples. The evaluated grid includes exact 2.45 and 14.1 MeV samples and 1° angles. Energies inside resonance ranges that are not reconstructed are masked, and a mixture needs every isotope. A second ENDF reader, written separately, reproduces the stored evaluated curves at 2.45 MeV within float32 precision.</p>
       <p><strong>JENDL qualification:</strong> the Xe files are the NNDC JENDL-4.0 snapshot. JAEA's update register lists no Xe update, and their angular coefficients reproduce those of the IAEA JENDL-4.0u conversion for Geant4 to 10⁻¹⁶ (orders up to 10, 1–3 MeV); byte identity with the 4.0u archive has not been established.</p>
-      <p>The model grid interpolates in log energy and log angular cross section; the evaluated display interpolates linearly in energy and cos θ. Deep minima between energy samples can have large relative errors: this is a teaching display, not a transport or fitting database. Non-relativistic kinematics use M = A × amu, except the forward-limit test above, which uses the relativistic wave number.</p>
+      <p>The model grid interpolates in log energy and log angular cross section; the evaluated display interpolates linearly in energy and \(\cos\theta\). Deep minima between energy samples can have large relative errors: this is a teaching display, not a transport or fitting database. Non-relativistic kinematics use \(M = A \times\) amu, except the forward-limit test above, which uses the relativistic wave number.</p>
       <div id="coverage-table" class="table-wrap"></div>
       <ul>
         <li><a href="https://www.nndc.bnl.gov/endf-b7.1/">NNDC ENDF/B-VII.1</a>; <a href="https://wwwndc.jaea.go.jp/jendl/j40/j40.html">JAEA JENDL-4.0</a> and its <a href="https://wwwndc.jaea.go.jp/jendl/j40/update/">update register</a>; <a href="https://www.oecd-nea.org/dbdata/jeff/">NEA JEFF</a>.</li>
